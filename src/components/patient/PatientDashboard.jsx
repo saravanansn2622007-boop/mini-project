@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { LabTrendsChart } from './LabTrendsChart';
 import { PatientProfileModal } from './PatientProfileModal';
+import { MedicalReportModal } from './MedicalReportModal';
 
 export function PatientDashboard({ 
   patient, 
@@ -42,6 +43,7 @@ export function PatientDashboard({
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [reminderDosesChecked, setReminderDosesChecked] = useState({});
+  const [viewingReport, setViewingReport] = useState(null);
 
   if (!patient) return null;
 
@@ -817,16 +819,35 @@ export function PatientDashboard({
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '16px',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '8px',
                       fontSize: '0.75rem',
                       color: 'var(--text-muted)',
                       borderTop: '1px dashed var(--border-medium)',
                       paddingTop: '8px',
                       marginTop: '8px'
                     }}>
-                      <span><strong>Doctor:</strong> {item.doctor}</span>
-                      <span>•</span>
-                      <span><strong>Facility:</strong> {item.facility}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <span><strong>Doctor:</strong> {item.doctor}</span>
+                        <span>•</span>
+                        <span><strong>Facility:</strong> {item.facility}</span>
+                      </div>
+                      {(item.category === 'Lab Test' || item.category === 'Operation' || item.category === 'Diagnosis' || item.category === 'Consultation') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const matched = patient.documents.find(d => d.date === item.date || d.title.toLowerCase().includes(item.title.toLowerCase().split(' ')[0])) || patient.documents[0];
+                            setViewingReport(matched);
+                          }}
+                          className="btn btn-secondary btn-sm"
+                          style={{ padding: '3px 8px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          title="Show Full Diagnostic Report"
+                        >
+                          <FileText size={12} color="var(--primary)" />
+                          <span>Show Report</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1167,11 +1188,14 @@ export function PatientDashboard({
                       {doc.fileType} • {doc.fileSize}
                     </span>
                     <button 
-                      onClick={() => alert(`Opening report viewer for: ${doc.title}`)}
-                      className="btn btn-secondary btn-sm"
-                      style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                      type="button"
+                      onClick={() => setViewingReport(doc)}
+                      className="btn btn-primary btn-sm"
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', fontSize: '0.78rem', fontWeight: 600 }}
+                      title="Show Detailed Clinical Report & Imaging"
                     >
-                      View Report
+                      <FileText size={13} />
+                      <span>Show Report</span>
                     </button>
                   </div>
                 </div>
@@ -1519,6 +1543,15 @@ export function PatientDashboard({
             setShowProfileModal(false);
             setShowQRModal(true);
           }}
+        />
+      )}
+
+      {/* Detailed Medical Report Viewer Modal */}
+      {viewingReport && (
+        <MedicalReportModal
+          report={viewingReport}
+          patient={patient}
+          onClose={() => setViewingReport(null)}
         />
       )}
     </div>
