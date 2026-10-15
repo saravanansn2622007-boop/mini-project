@@ -422,3 +422,71 @@ textarea.form-control {
   background: var(--primary);
   color: #ffffff;
 }
+
+/* Dropdown Menu & Segmented Subtabs */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 120;
+  min-width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-subtle);
+  color: var(--primary);
+  transform: translateX(2px);
+}
+
+.subtab-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.subtab-pill:hover {
+  color: var(--text-main);
+  background: rgba(2, 132, 199, 0.05);
+}
+
+.subtab-pill.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  font-weight: 700;
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-sm);
+}

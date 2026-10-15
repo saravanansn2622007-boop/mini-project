@@ -47,6 +47,7 @@ export function DoctorPortal({
   const [followUpDate, setFollowUpDate] = useState('4 Weeks');
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [activeDoctorTab, setActiveDoctorTab] = useState('summary'); // 'summary', 'newNote', 'compareReports', 'timeline'
+  const [sessionTimestamp] = useState(() => new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
   // Look up patient on search
   const handleSearch = (e) => {
@@ -68,7 +69,7 @@ export function DoctorPortal({
   const isConsentActive = Boolean(
     patientConsent && 
     patientConsent.status === 'Active' && 
-    (!patientConsent.expiryDate || new Date(patientConsent.expiryDate) > new Date() || new Date(patientConsent.expiryDate).getFullYear() >= 2025)
+    (!patientConsent.expiryDate || patientConsent.expiryDate >= '2025-01-01')
   );
 
   // Handle submitting consultation
@@ -605,7 +606,7 @@ export function DoctorPortal({
                   marginTop: '10px'
                 }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Signing Provider: <strong>{activeDoctor.name}</strong> • Timestamp: {new Date().toLocaleString()}
+                    Signing Provider: <strong>{activeDoctor.name}</strong> • Timestamp: {sessionTimestamp}
                   </div>
                   <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ShieldCheck size={16} />

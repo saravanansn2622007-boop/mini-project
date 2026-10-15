@@ -18,22 +18,22 @@ import {
 import confetti from 'canvas-confetti';
 
 export function PatientProfileModal({ patient, onUpdatePatient, onClose, onOpenQR }) {
-  if (!patient) return null;
-
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: patient.name || '',
-    dob: patient.dob || '',
-    gender: patient.gender || 'Female',
-    bloodGroup: patient.bloodGroup || 'O+',
-    phone: patient.phone || '',
-    email: patient.email || '',
-    address: patient.address || '',
-    emergencyName: patient.emergencyContact?.name || '',
-    emergencyPhone: patient.emergencyContact?.phone || '',
-    emergencyRelation: patient.emergencyContact?.relation || 'Spouse',
-    insuranceId: patient.insuranceId || 'MED-CARE-882194-A'
+    name: patient?.name || '',
+    dob: patient?.dob || '',
+    gender: patient?.gender || 'Female',
+    bloodGroup: patient?.bloodGroup || 'O+',
+    phone: patient?.phone || '',
+    email: patient?.email || '',
+    address: patient?.address || '',
+    emergencyName: patient?.emergencyContact?.name || '',
+    emergencyPhone: patient?.emergencyContact?.phone || '',
+    emergencyRelation: patient?.emergencyContact?.relation || 'Spouse',
+    insuranceId: patient?.insuranceId || 'MED-CARE-882194-A'
   });
+
+  if (!patient) return null;
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

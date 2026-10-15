@@ -4,7 +4,6 @@ import {
   Calendar, 
   Clock, 
   ShieldAlert, 
-  Heart, 
   Pill, 
   Syringe, 
   Scissors, 
@@ -14,19 +13,13 @@ import {
   Plus, 
   Scan, 
   Download, 
-  AlertTriangle, 
   QrCode, 
-  CheckCircle, 
-  XCircle, 
   Phone, 
   MapPin, 
-  ExternalLink,
-  ChevronRight,
-  TrendingDown,
-  Bell,
-  Check,
-  Building,
-  RefreshCw
+  ChevronRight, 
+  Bell, 
+  ChevronDown,
+  XCircle
 } from 'lucide-react';
 import { LabTrendsChart } from './LabTrendsChart';
 import { PatientProfileModal } from './PatientProfileModal';
@@ -36,16 +29,18 @@ export function PatientDashboard({
   onGrantConsentOpen, 
   onOpenOCRScanner, 
   onOpenExportSummary, 
-  onOpenEmergencyModal,
+  onOpenEmergencyModal: _onOpenEmergencyModal,
   onOpenAddRecord,
   onRevokeConsent,
   onToggleConsentCategory,
   onUpdatePatient
 }) {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'timeline', 'records', 'meds', 'vaccines', 'labs', 'consent', 'reminders'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'records', 'consent', 'reminders'
+  const [recordsSubTab, setRecordsSubTab] = useState('timeline'); // 'timeline', 'meds', 'labs', 'surgeries', 'vaccines'
   const [timelineFilter, setTimelineFilter] = useState('All');
   const [showQRModal, setShowQRModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [reminderDosesChecked, setReminderDosesChecked] = useState({});
 
   if (!patient) return null;
@@ -196,52 +191,89 @@ export function PatientDashboard({
           </div>
         </div>
 
-        {/* Right: Quick Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <button 
-            onClick={() => setShowQRModal(true)}
-            className="btn btn-secondary btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <QrCode size={15} />
-            <span>Patient QR</span>
-          </button>
-
-          <button 
-            onClick={onOpenOCRScanner}
-            className="btn btn-secondary btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'var(--primary)', color: 'var(--primary)' }}
-          >
-            <Scan size={15} />
-            <span>AI Document OCR</span>
-          </button>
-
-          <button 
-            onClick={onGrantConsentOpen}
-            className="btn btn-primary btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Lock size={15} />
-            <span>Grant Doctor Access</span>
-          </button>
-
-          <button 
-            onClick={onOpenExportSummary}
-            className="btn btn-emerald btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Download size={15} />
-            <span>Export Health Record</span>
-          </button>
-
+        {/* Right: Streamlined Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', position: 'relative' }}>
+          {/* Primary Action Button */}
           <button 
             onClick={onOpenAddRecord}
-            className="btn btn-secondary btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            className="btn btn-primary btn-sm"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', fontWeight: 600 }}
           >
             <Plus size={15} />
-            <span>Add Entry</span>
+            <span>Add Record</span>
           </button>
+
+          {/* Quick Doctor Consent Action */}
+          <button 
+            onClick={onGrantConsentOpen}
+            className="btn btn-secondary btn-sm"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'var(--border-accent)', color: 'var(--primary)', padding: '8px 14px' }}
+          >
+            <Lock size={14} />
+            <span>Grant Access</span>
+          </button>
+
+          {/* More Actions Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setShowActionsMenu(prev => !prev)}
+              className="btn btn-secondary btn-sm"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px' }}
+              title="More Actions & Tools"
+            >
+              <span>More Actions</span>
+              <ChevronDown size={14} style={{ transform: showActionsMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </button>
+
+            {showActionsMenu && (
+              <>
+                <div 
+                  style={{ position: 'fixed', inset: 0, zIndex: 110 }} 
+                  onClick={() => setShowActionsMenu(false)} 
+                />
+                <div 
+                  className="dropdown-menu animate-fade-in"
+                  onClick={() => setShowActionsMenu(false)}
+                >
+                  <button
+                    onClick={onOpenOCRScanner}
+                    className="dropdown-item"
+                    type="button"
+                  >
+                    <Scan size={15} color="var(--primary)" />
+                    <span>AI Document OCR</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowQRModal(true)}
+                    className="dropdown-item"
+                    type="button"
+                  >
+                    <QrCode size={15} color="var(--teal)" />
+                    <span>Patient QR Code</span>
+                  </button>
+
+                  <button
+                    onClick={onOpenExportSummary}
+                    className="dropdown-item"
+                    type="button"
+                  >
+                    <Download size={15} color="var(--emerald)" />
+                    <span>Export Health Record</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowProfileModal(true)}
+                    className="dropdown-item"
+                    type="button"
+                  >
+                    <User size={15} color="var(--purple)" />
+                    <span>Edit Health Profile</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -275,14 +307,29 @@ export function PatientDashboard({
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {[
-                { id: 'overview', label: 'Overview & Profile', icon: User },
-                { id: 'timeline', label: 'Unified Medical Timeline', icon: Clock, badge: patient.timeline.length },
-                { id: 'records', label: 'History & Surgeries', icon: Scissors, badge: patient.surgeriesAndHospitalizations.length },
-                { id: 'meds', label: 'Medicines & Rx', icon: Pill, badge: patient.medications.filter(m => m.status === 'Active').length },
-                { id: 'vaccines', label: 'Vaccination History', icon: Syringe, badge: patient.vaccinations.length },
-                { id: 'labs', label: 'Reports & Biomarker Trends', icon: Activity, badge: patient.documents.length },
-                { id: 'consent', label: 'Smart Consent Management', icon: Lock, badge: patient.consents.filter(c => c.status === 'Active').length },
-                { id: 'reminders', label: 'Reminders & Schedules', icon: Bell }
+                { 
+                  id: 'overview', 
+                  label: 'Overview & Vitals', 
+                  icon: Activity 
+                },
+                { 
+                  id: 'records', 
+                  label: 'Unified Health Records', 
+                  icon: FileText, 
+                  badge: patient.timeline.length + patient.medications.length + patient.documents.length 
+                },
+                { 
+                  id: 'consent', 
+                  label: 'Doctor Access & Consent', 
+                  icon: Lock, 
+                  badge: patient.consents.filter(c => c.status === 'Active').length 
+                },
+                { 
+                  id: 'reminders', 
+                  label: 'Schedule & Reminders', 
+                  icon: Bell, 
+                  badge: patient.medications.filter(m => m.status === 'Active').length 
+                }
               ].map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -411,7 +458,27 @@ export function PatientDashboard({
                   <Activity size={18} color="var(--primary)" />
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Latest Recorded Vitals</h3>
                 </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Updated 2024-08-10</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('records');
+                    setRecordsSubTab('labs');
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <span>Biomarker Trends</span>
+                  <ChevronRight size={13} />
+                </button>
               </div>
 
               <div style={{
@@ -445,7 +512,27 @@ export function PatientDashboard({
             <div className="card">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Ongoing Diagnoses & Chronic Conditions</h3>
-                <span className="badge badge-primary">{patient.chronicConditions.length} Documented</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('records');
+                    setRecordsSubTab('meds');
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <span>Active Meds</span>
+                  <ChevronRight size={13} />
+                </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {patient.chronicConditions.map((cond, i) => (
@@ -573,31 +660,82 @@ export function PatientDashboard({
         </div>
       )}
 
-      {/* ================= TAB 2: UNIFIED MEDICAL TIMELINE ================= */}
-      {activeTab === 'timeline' && (
-        <div className="card animate-fade-in">
-          {/* Header & Filter Controls */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '12px',
-            borderBottom: '1px solid var(--border-subtle)',
-            paddingBottom: '16px',
-            marginBottom: '20px'
-          }}>
+      {/* ================= TAB 2: UNIFIED HEALTH RECORDS ================= */}
+      {activeTab === 'records' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} className="animate-fade-in">
+          {/* Segmented Sub-Tab Header Bar */}
+          <div className="card" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
             <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                Unified Chronological Medical Timeline
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                Unified Health Records
               </h2>
-              <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                Unified stream of diagnoses, prescriptions, surgeries, lab tests, and hospitalizations
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                View complete clinical visits, medications, diagnostic labs, surgeries, and immunizations
               </p>
             </div>
 
-            {/* Filter pills */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {/* Sub-Tab Navigation Pills */}
+            <div style={{
+              display: 'flex',
+              background: 'var(--bg-subtle)',
+              padding: '4px',
+              borderRadius: 'var(--radius-full)',
+              border: '1px solid var(--border-medium)',
+              gap: '4px',
+              flexWrap: 'wrap'
+            }}>
+              {[
+                { id: 'timeline', label: 'Timeline Visits', icon: Clock, count: patient.timeline.length },
+                { id: 'meds', label: 'Medicines & Rx', icon: Pill, count: patient.medications.filter(m => m.status === 'Active').length },
+                { id: 'labs', label: 'Lab Reports & Trends', icon: Activity, count: patient.documents.length },
+                { id: 'surgeries', label: 'Surgeries & Hospital', icon: Scissors, count: patient.surgeriesAndHospitalizations.length },
+                { id: 'vaccines', label: 'Vaccines', icon: Syringe, count: patient.vaccinations.length }
+              ].map(sub => {
+                const SubIcon = sub.icon;
+                const isSelected = recordsSubTab === sub.id;
+                return (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    onClick={() => setRecordsSubTab(sub.id)}
+                    className={`subtab-pill ${isSelected ? 'active' : ''}`}
+                  >
+                    <SubIcon size={14} color={isSelected ? 'var(--primary)' : 'var(--text-muted)'} />
+                    <span>{sub.label}</span>
+                    <span className={`badge ${isSelected ? 'badge-primary' : 'badge-neutral'}`} style={{ padding: '1px 6px', fontSize: '0.68rem' }}>
+                      {sub.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Subtab 1: Timeline Visits */}
+          {recordsSubTab === 'timeline' && (
+            <div className="card animate-fade-in">
+              {/* Header & Filter Controls */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+                borderBottom: '1px solid var(--border-subtle)',
+                paddingBottom: '16px',
+                marginBottom: '20px'
+              }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                    Chronological Clinical Timeline
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                    Unified stream of diagnoses, prescriptions, surgeries, lab tests, and hospitalizations
+                  </p>
+                </div>
+
+                {/* Filter pills */}
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {['All', 'Consultation', 'Diagnosis', 'Prescription', 'Operation', 'Lab Test', 'Vaccination'].map(f => (
                 <button
                   key={f}
@@ -696,10 +834,10 @@ export function PatientDashboard({
             </div>
           </div>
         </div>
-      )}
+          )}
 
-      {/* ================= TAB 3: MEDICAL HISTORY & SURGERIES ================= */}
-      {activeTab === 'records' && (
+          {/* Subtab 4: Surgeries, Operations & Hospital Visits */}
+          {recordsSubTab === 'surgeries' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
           {/* Operations & Hospitalizations Section */}
           <div className="card">
@@ -770,10 +908,10 @@ export function PatientDashboard({
             </div>
           </div>
         </div>
-      )}
+          )}
 
-      {/* ================= TAB 4: MEDICINES & PRESCRIPTION HISTORY ================= */}
-      {activeTab === 'meds' && (
+          {/* Subtab 2: Medicines & Prescription Records */}
+          {recordsSubTab === 'meds' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} className="animate-fade-in">
           <div className="card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
@@ -866,10 +1004,10 @@ export function PatientDashboard({
             </div>
           </div>
         </div>
-      )}
+          )}
 
-      {/* ================= TAB 5: VACCINATION HISTORY ================= */}
-      {activeTab === 'vaccines' && (
+          {/* Subtab 5: Vaccination & Immunization Ledger */}
+          {recordsSubTab === 'vaccines' && (
         <div className="card animate-fade-in">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <div>
@@ -941,10 +1079,10 @@ export function PatientDashboard({
             ))}
           </div>
         </div>
-      )}
+          )}
 
-      {/* ================= TAB 6: REPORTS & LAB BIOMARKER TRENDS ================= */}
-      {activeTab === 'labs' && (
+          {/* Subtab 3: Reports & Lab Biomarker Trends */}
+          {recordsSubTab === 'labs' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
           {/* Interactive Trend Chart */}
           <LabTrendsChart labTrends={patient.labTrends} />
@@ -1041,9 +1179,11 @@ export function PatientDashboard({
             </div>
           </div>
         </div>
+          )}
+        </div>
       )}
 
-      {/* ================= TAB 7: SMART CONSENT MANAGEMENT ================= */}
+      {/* ================= TAB 3: SMART CONSENT MANAGEMENT ================= */}
       {activeTab === 'consent' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }} className="animate-fade-in">
           {/* Active Consents Card */}
